@@ -45,10 +45,10 @@
 
         // Asteroid variables
         let asteroids = [];
-        let asteroidSpeed = 4; // Increased speed
+        let asteroidSpeed = 5; // Increased speed
 
         // Healing asteroid chance
-        let healingChance = 0.03; // 3% chance of a healing asteroid
+        let healingChance = 0.02; // 2% chance of a healing asteroid
 
         // Player movement
         document.addEventListener("keydown", function(event) {
@@ -61,16 +61,16 @@
 
         function handlePlayerMovement() {
             if (("ArrowLeft" in keysPressed || "a" in keysPressed) && player.x > 0) {
-                player.x -= 6; // Increased speed
+                player.x -= 7; // Increased speed
             }
             if (("ArrowRight" in keysPressed || "d" in keysPressed) && player.x < gameCanvas.width - player.width) {
-                player.x += 6; // Increased speed
+                player.x += 7; // Increased speed
             }
             if (("ArrowUp" in keysPressed || "w" in keysPressed) && player.y > 0) {
-                player.y -= 6; // Increased speed
+                player.y -= 7; // Increased speed
             }
             if (("ArrowDown" in keysPressed || "s" in keysPressed) && player.y < gameCanvas.height - player.height) {
-                player.y += 6; // Increased speed
+                player.y += 7; // Increased speed
             }
         }
 
@@ -115,7 +115,7 @@
                 }
             }
             // Generate new asteroids randomly
-            if (Math.random() < 0.05) {
+            if (Math.random() < 0.1) { // Increased frequency
                 let asteroidWidth = Math.random() * 50 + 20;
                 let asteroidHeight = Math.random() * 50 + 20;
                 let asteroid = {
