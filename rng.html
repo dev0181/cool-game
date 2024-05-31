@@ -45,7 +45,7 @@
 
         // Asteroid variables
         let asteroids = [];
-        let asteroidSpeed = 2;
+        let asteroidSpeed = 4; // Increased speed
 
         // Healing asteroid chance
         let healingChance = 0.03; // 3% chance of a healing asteroid
@@ -61,16 +61,16 @@
 
         function handlePlayerMovement() {
             if (("ArrowLeft" in keysPressed || "a" in keysPressed) && player.x > 0) {
-                player.x -= 3;
+                player.x -= 6; // Increased speed
             }
             if (("ArrowRight" in keysPressed || "d" in keysPressed) && player.x < gameCanvas.width - player.width) {
-                player.x += 3;
+                player.x += 6; // Increased speed
             }
             if (("ArrowUp" in keysPressed || "w" in keysPressed) && player.y > 0) {
-                player.y -= 3;
+                player.y -= 6; // Increased speed
             }
             if (("ArrowDown" in keysPressed || "s" in keysPressed) && player.y < gameCanvas.height - player.height) {
-                player.y += 3;
+                player.y += 6; // Increased speed
             }
         }
 
