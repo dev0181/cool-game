@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Dodge</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+
+        #game-container {
+            text-align: center;
+        }
+
+        #score, #health {
+            font-size: 24px;
+        }
+
+        #game-canvas {
+            border: 1px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="score">Score: 0</div>
+        <div id="best-score">Best Score: 0</div>
+        <div id="health">Health: 100</div>
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+    </div>
+    <script>
+        // Game variables
+        let score = 0;
+        let bestScore = localStorage.getItem("bestScore") || 0;
+        let health = 100;
+        let gameCanvas = document.getElementById("game-canvas");
+        let ctx = gameCanvas.getContext("2d");
+        let player = { x: 400, y: 550, width: 50, height: 50 };
+        let keysPressed = {};
+
+        // Asteroid variables
+        let asteroids = [];
+        let asteroidSpeed = 2;
+
+        // Healing asteroid chance
+        let healingChance = 0.03; // 3% chance of a healing asteroid
+
+        // Player movement
+        document.addEventListener("keydown", function(event) {
+            keysPressed[event.key] = true;
+        });
+
+        document.addEventListener("keyup", function(event) {
+            delete keysPressed[event.key];
+        });
+
+        function handlePlayerMovement() {
+            if (("ArrowLeft" in keysPressed || "a" in keysPressed) && player.x > 0) {
+                player.x -= 3;
+            }
+            if (("ArrowRight" in keysPressed || "d" in keysPressed) && player.x < gameCanvas.width - player.width) {
+                player.x += 3;
+            }
+            if (("ArrowUp" in keysPressed || "w" in keysPressed) && player.y > 0) {
+                player.y -= 3;
+            }
+            if (("ArrowDown" in keysPressed || "s" in keysPressed) && player.y < gameCanvas.height - player.height) {
+                player.y += 3;
+            }
+        }
+
+        // Game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            // Update game elements
+            handlePlayerMovement();
+            updateAsteroids();
+            detectCollision();
+
+            // Draw game elements
+            drawPlayer();
+            drawAsteroids();
+
+            // Update score and health display
+            document.getElementById("score").innerHTML = "Score: " + score;
+            document.getElementById("best-score").innerHTML = "Best Score: " + bestScore;
+            document.getElementById("health").innerHTML = "Health: " + health;
+
+            // Request next frame
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Draw player
+        function drawPlayer() {
+            ctx.fillStyle = "#00ff00";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        // Update asteroids position
+        function updateAsteroids() {
+            // Move asteroids downward
+            for (let i = 0; i < asteroids.length; i++) {
+                asteroids[i].y += asteroidSpeed;
+                // Remove asteroids if they go off the screen
+                if (asteroids[i].y > gameCanvas.height) {
+                    asteroids.splice(i, 1);
+                    score += 10;
+                }
+            }
+            // Generate new asteroids randomly
+            if (Math.random() < 0.05) {
+                let asteroidWidth = Math.random() * 50 + 20;
+                let asteroidHeight = Math.random() * 50 + 20;
+                let asteroid = {
+                    x: Math.random() * (gameCanvas.width - asteroidWidth),
+                    y: -50,
+                    width: asteroidWidth,
+                    height: asteroidHeight,
+                    isHealing: Math.random() < healingChance,
+                    value: Math.round((asteroidWidth + asteroidHeight) / 10) // Calculate value based on size
+                };
+                asteroids.push(asteroid);
+            }
+        }
+
+        // Draw asteroids
+        function drawAsteroids() {
+            for (let i = 0; i < asteroids.length; i++) {
+                let asteroid = asteroids[i];
+                ctx.fillStyle = asteroid.isHealing ? "#00ff00" : "#ff0000";
+                ctx.fillRect(asteroid.x, asteroid.y, asteroid.width, asteroid.height);
+            }
+        }
+
+        // Collision detection
+        function detectCollision() {
+            for (let i = 0; i < asteroids.length; i++) {
+                let asteroid = asteroids[i];
+                if (
+                    player.x < asteroid.x + asteroid.width &&
+                    player.x + player.width > asteroid.x &&
+                    player.y < asteroid.y + asteroid.height &&
+                    player.y + player.height > asteroid.y
+                ) {
+                    // Collision detected
+                    if (asteroid.isHealing) {
+                        // Healing asteroid
+                        health = Math.min(health + asteroid.value, 100); // Increase health, capped at 100
+                    } else {
+                        // Damage asteroid
+                        health -= asteroid.value;
+                        if (health <= 0) {
+                            gameOver();
+                        }
+                    }
+                    asteroids.splice(i, 1);
+                    score += asteroid.isHealing ? asteroid.value * 2 : -asteroid.value; // Score increases for healing, decreases for damage
+                }
+            }
+        }
+
+        // Game over
+        function gameOver() {
+            alert("Game Over! Your final score is: " + score);
+            // Update best score if needed
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem("bestScore", bestScore);
+            }
+            // Reset variables for a new game
+            score = 0;
+            health = 100;
+            asteroids = [];
+        }
+
+        // Start the game loop
+        gameLoop();
+    </script>
+</body>
+</html>
